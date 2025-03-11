@@ -518,7 +518,7 @@ ssize_t scte35_parse_descriptors(struct scte35_splice_info_section_s *si, uint8_
 
 }
 
-ssize_t scte35_splice_info_section_unpackFrom(struct scte35_splice_info_section_s *si, uint8_t *src, uint32_t srcLengthBytes)
+ssize_t scte35_splice_info_section_unpackFrom(struct scte35_splice_info_section_s *si, const uint8_t *src, uint32_t srcLengthBytes)
 {
 	uint32_t v;
 
@@ -526,7 +526,7 @@ ssize_t scte35_splice_info_section_unpackFrom(struct scte35_splice_info_section_
 		return -KLSCTE35_ERR_INVAL;
 
 	struct klbs_context_s *bs = klbs_alloc();
-	klbs_read_set_buffer(bs, src, srcLengthBytes);
+	klbs_read_set_buffer(bs, (uint8_t *)src, srcLengthBytes);
 
 	si->table_id = klbs_read_bits(bs, 8);
 	if (si->table_id != SCTE35_TABLE_ID) {
@@ -681,7 +681,7 @@ ssize_t scte35_splice_info_section_unpackFrom(struct scte35_splice_info_section_
 	return byteCount;
 }
 
-struct scte35_splice_info_section_s *scte35_splice_info_section_parse(uint8_t *section, unsigned int byteCount)
+struct scte35_splice_info_section_s *scte35_splice_info_section_parse(const uint8_t *section, unsigned int byteCount)
 {
 	int ret;
 
@@ -762,7 +762,7 @@ int scte35_append_avail(struct scte35_splice_info_section_s *si, struct splice_d
 int scte35_parse_avail(struct splice_descriptor *desc, uint8_t *buf, unsigned int bufLength)
 {
 	struct klbs_context_s *bs = klbs_alloc();
-	klbs_write_set_buffer(bs, buf, bufLength);
+	klbs_read_set_buffer(bs, buf, bufLength);
 
 	desc->avail_data.provider_avail_id = klbs_read_bits(bs, 32);
 
@@ -803,7 +803,7 @@ int scte35_append_dtmf(struct scte35_splice_info_section_s *si, struct splice_de
 int scte35_parse_dtmf(struct splice_descriptor *desc, uint8_t *buf, unsigned int bufLength)
 {
 	struct klbs_context_s *bs = klbs_alloc();
-	klbs_write_set_buffer(bs, buf, bufLength);
+	klbs_read_set_buffer(bs, buf, bufLength);
 
 	desc->dtmf_data.preroll = klbs_read_bits(bs, 8);
 	desc->dtmf_data.dtmf_count = klbs_read_bits(bs, 3);
@@ -886,7 +886,7 @@ int scte35_parse_segmentation(struct splice_descriptor *desc, uint8_t *buf, unsi
 {
 	struct splice_descriptor_segmentation *seg = &desc->seg_data;
 	struct klbs_context_s *bs = klbs_alloc();
-	klbs_write_set_buffer(bs, buf, bufLength);
+	klbs_read_set_buffer(bs, buf, bufLength);
 
 	seg->event_id = klbs_read_bits(bs, 32);
 	seg->event_cancel_indicator = klbs_read_bits(bs, 1);
@@ -965,7 +965,7 @@ int scte35_append_time(struct scte35_splice_info_section_s *si, struct splice_de
 int scte35_parse_time(struct splice_descriptor *desc, uint8_t *buf, unsigned int bufLength)
 {
 	struct klbs_context_s *bs = klbs_alloc();
-	klbs_write_set_buffer(bs, buf, bufLength);
+	klbs_read_set_buffer(bs, buf, bufLength);
 
 	desc->time_data.TAI_seconds = klbs_read_bits(bs, 48);
 	desc->time_data.TAI_ns = klbs_read_bits(bs, 32);
