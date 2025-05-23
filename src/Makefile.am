@@ -1,6 +1,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libklscte35.pc
+
 lib_LTLIBRARIES = libklscte35.la
 
 libklscte35_la_SOURCES  = scte35.c
